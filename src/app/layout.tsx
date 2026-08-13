@@ -24,10 +24,23 @@ export const metadata: Metadata = {
   description:
     "Audit Shopify products against Google Merchant Center rules. Find missing GTINs, brand, apparel attributes, and silent sync gaps — then fix them before ads die.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://shelfcheck.io"),
+  applicationName: "ShelfCheck",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+  },
+  appleWebApp: {
+    title: "ShelfCheck",
+    statusBarStyle: "default",
+  },
   openGraph: {
     title: "ShelfCheck by Skuform",
     description: "Catalog health for Google Shopping on Shopify.",
     type: "website",
+    images: [{ url: "/brand/icon-512.png", alt: "ShelfCheck" }],
   },
 };
 
