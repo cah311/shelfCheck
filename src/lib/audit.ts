@@ -317,3 +317,17 @@ export function toSupplementalFeedRow(product: ProductInput): Record<string, str
     condition: "new",
   };
 }
+
+export function scanToCsv(scan: ScanResult, withFixes = true): string {
+  const rows = scan.products.map((p) => {
+    const product = withFixes ? applySuggestedFixes(p) : p.product;
+    return toSupplementalFeedRow(product);
+  });
+  if (!rows.length) return "";
+  const headers = Object.keys(rows[0]);
+  const escape = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
+  return [
+    headers.join(","),
+    ...rows.map((r) => headers.map((h) => escape(r[h] ?? "")).join(",")),
+  ].join("\n");
+}

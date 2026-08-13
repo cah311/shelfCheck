@@ -3,17 +3,19 @@ import path from "path";
 import { randomUUID } from "crypto";
 import type { ScanResult, SubscriptionRecord, WaitlistEntry } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// Vercel serverless is read-only except /tmp (ephemeral, per-instance).
+const DATA_DIR = process.env.VERCEL
+  ? path.join("/tmp", "shelfcheck-data")
+  : path.join(process.cwd(), "data");
 
 async function ensureDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
 }
 
 async function readJson<T>(file: string, fallback: T): Promise<T> {
-  await ensureDir();
-  const full = path.join(DATA_DIR, file);
   try {
-    const raw = await fs.readFile(full, "utf8");
+    await ensureDir();
+    const raw = await fs.readFile(path.join(DATA_DIR, file), "utf8");
     return JSON.parse(raw) as T;
   } catch {
     return fallback;
@@ -21,9 +23,16 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
 }
 
 async function writeJson<T>(file: string, data: T): Promise<void> {
-  await ensureDir();
-  const full = path.join(DATA_DIR, file);
-  await fs.writeFile(full, JSON.stringify(data, null, 2), "utf8");
+  try {
+    await ensureDir();
+    await fs.writeFile(
+      path.join(DATA_DIR, file),
+      JSON.stringify(data, null, 2),
+      "utf8"
+    );
+  } catch (err) {
+    console.error(`store write failed (${file})`, err);
+  }
 }
 
 export async function addWaitlistEntry(

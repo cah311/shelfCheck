@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ReviewPrompt } from "@/components/ReviewPrompt";
+import { scanToCsv } from "@/lib/audit";
 import type { ScanResult } from "@/lib/types";
 
 export default function AppPage() {
@@ -40,6 +41,18 @@ export default function AppPage() {
     if (!scan) return;
     const ids = autoFixable.map((p) => p.product.id);
     setFixedIds(ids);
+  }
+
+  function downloadFeed() {
+    if (!scan) return;
+    const csv = scanToCsv(scan, true);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `shelfcheck-${scan.id}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -95,9 +108,9 @@ export default function AppPage() {
             >
               Apply {autoFixable.length} autofixes
             </button>
-            <a className="btn-secondary" href={`/api/scan/${scan.id}/export?fixes=1`}>
+            <button type="button" className="btn-secondary" onClick={downloadFeed}>
               Download supplemental feed CSV
-            </a>
+            </button>
           </div>
 
           {fixedIds.length > 0 && (
