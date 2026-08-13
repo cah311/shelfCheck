@@ -3,19 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #142019;
+  --forest: #0b3d2e;
+  --forest-2: #147056;
+  --gold: #f4c15d;
+  --danger: #c23b22;
+  --warn: #b7791f;
+  --cream: #f4efe4;
+  --cream-2: #ebe4d4;
+  --line: #ddd4c4;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--font-sans), Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm transition;
+  background: var(--forest);
+}
+.btn-primary:hover {
+  background: var(--forest-2);
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  @apply cursor-not-allowed opacity-60;
+  transform: none;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-full border px-5 py-3 text-sm font-semibold transition;
+  border-color: var(--line);
+  background: white;
+}
+.btn-secondary:hover {
+  background: #fffef8;
+  border-color: #cfc5b2;
+}
+
+.card {
+  @apply rounded-2xl border bg-white;
+  border-color: var(--line);
+  box-shadow: 0 1px 0 rgba(20, 32, 25, 0.04), 0 18px 40px -28px rgba(11, 61, 46, 0.35);
+}
+
+.badge-critical {
+  @apply rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white;
+  background: var(--danger);
+}
+.badge-warning {
+  @apply rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--ink)];
+  background: var(--gold);
+}
+.badge-info {
+  @apply rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+  background: #e8e4da;
+  color: var(--ink);
+}
+
+input,
+select {
+  background: #fffefb;
 }
