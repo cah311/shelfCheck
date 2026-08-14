@@ -5,11 +5,10 @@ import { normalizeStoreUrl } from "@/lib/urls";
 
 const schema = z.object({
   email: z.string().email(),
-  storeUrl: z
-    .string()
-    .optional()
-    .transform((v) => normalizeStoreUrl(v ?? ""))
-    .pipe(z.string().url().optional().or(z.literal(""))),
+  storeUrl: z.preprocess(
+    (v) => (typeof v === "string" ? normalizeStoreUrl(v) : ""),
+    z.union([z.literal(""), z.string().url()])
+  ),
   skuCount: z.string().optional(),
   intent: z.enum(["waitlist", "founding"]).default("waitlist"),
   source: z.string().optional(),
