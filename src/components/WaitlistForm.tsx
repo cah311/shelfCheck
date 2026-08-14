@@ -118,7 +118,7 @@ export function WaitlistForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@brand.com"
-          className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-[var(--gold)] ${
+          className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--ink)]/40 focus:border-[var(--gold)] ${
             dark
               ? "border-white/15 bg-white/95"
               : "border-[var(--line)]"
@@ -141,7 +141,7 @@ export function WaitlistForm({
             value={storeUrl}
             onChange={(e) => setStoreUrl(e.target.value)}
             placeholder="yourstore.myshopify.com"
-            className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-[var(--gold)] ${
+            className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--ink)]/40 focus:border-[var(--gold)] ${
               dark ? "border-white/15 bg-white/95" : "border-[var(--line)]"
             }`}
           />
@@ -157,7 +157,7 @@ export function WaitlistForm({
           <select
             value={skuCount}
             onChange={(e) => setSkuCount(e.target.value)}
-            className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-[var(--gold)] ${
+            className={`mt-1 w-full rounded-xl border px-3 py-2.5 text-sm text-[var(--ink)] outline-none focus:border-[var(--gold)] ${
               dark ? "border-white/15 bg-white/95" : "border-[var(--line)]"
             }`}
           >
