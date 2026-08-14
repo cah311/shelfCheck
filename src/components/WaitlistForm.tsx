@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { normalizeStoreUrl } from "@/lib/urls";
 
 type Intent = "waitlist" | "founding";
 
@@ -25,6 +26,7 @@ export function WaitlistForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
+    const normalizedStoreUrl = normalizeStoreUrl(storeUrl);
     try {
       if (intent === "founding") {
         const res = await fetch("/api/checkout", {
@@ -37,7 +39,13 @@ export function WaitlistForm({
         await fetch("/api/waitlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, storeUrl, skuCount, intent, source }),
+          body: JSON.stringify({
+            email,
+            storeUrl: normalizedStoreUrl,
+            skuCount,
+            intent,
+            source,
+          }),
         });
         if (data.url) {
           window.location.href = data.url;
@@ -50,7 +58,13 @@ export function WaitlistForm({
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, storeUrl, skuCount, intent, source }),
+        body: JSON.stringify({
+          email,
+          storeUrl: normalizedStoreUrl,
+          skuCount,
+          intent,
+          source,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Signup failed");
@@ -121,7 +135,9 @@ export function WaitlistForm({
             Store URL
           </label>
           <input
-            type="url"
+            type="text"
+            inputMode="url"
+            autoComplete="url"
             value={storeUrl}
             onChange={(e) => setStoreUrl(e.target.value)}
             placeholder="yourstore.myshopify.com"

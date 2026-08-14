@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { addWaitlistEntry, listWaitlist } from "@/lib/store";
+import { normalizeStoreUrl } from "@/lib/urls";
 
 const schema = z.object({
   email: z.string().email(),
-  storeUrl: z.string().url().optional().or(z.literal("")),
+  storeUrl: z
+    .string()
+    .optional()
+    .transform((v) => normalizeStoreUrl(v ?? ""))
+    .pipe(z.string().url().optional().or(z.literal(""))),
   skuCount: z.string().optional(),
   intent: z.enum(["waitlist", "founding"]).default("waitlist"),
   source: z.string().optional(),
