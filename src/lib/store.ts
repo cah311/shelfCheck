@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { sql } from "./db";
 import type { ScanResult, SubscriptionRecord, WaitlistEntry } from "./types";
 
 // Vercel serverless is read-only except /tmp (ephemeral, per-instance).
@@ -35,34 +36,64 @@ async function writeJson<T>(file: string, data: T): Promise<void> {
   }
 }
 
+type WaitlistRow = {
+  id: string;
+  email: string;
+  store_url: string | null;
+  sku_count: string | null;
+  intent: WaitlistEntry["intent"];
+  source: string | null;
+  created_at: string | Date;
+};
+
+function mapWaitlist(row: WaitlistRow): WaitlistEntry {
+  return {
+    id: row.id,
+    email: row.email,
+    storeUrl: row.store_url ?? undefined,
+    skuCount: row.sku_count ?? undefined,
+    intent: row.intent,
+    source: row.source ?? undefined,
+    createdAt:
+      row.created_at instanceof Date
+        ? row.created_at.toISOString()
+        : row.created_at,
+  };
+}
+
 export async function addWaitlistEntry(
   entry: Omit<WaitlistEntry, "id" | "createdAt">
 ): Promise<WaitlistEntry> {
-  const list = await readJson<WaitlistEntry[]>("waitlist.json", []);
-  const existing = list.find(
-    (e) => e.email.toLowerCase() === entry.email.toLowerCase()
-  );
-  if (existing) {
-    if (entry.intent === "founding" && existing.intent !== "founding") {
-      existing.intent = "founding";
-      existing.storeUrl = entry.storeUrl ?? existing.storeUrl;
-      existing.skuCount = entry.skuCount ?? existing.skuCount;
-      await writeJson("waitlist.json", list);
-    }
-    return existing;
-  }
-  const row: WaitlistEntry = {
-    ...entry,
-    id: randomUUID(),
-    createdAt: new Date().toISOString(),
-  };
-  list.push(row);
-  await writeJson("waitlist.json", list);
-  return row;
+  const db = sql();
+  const rows = (await db`
+    INSERT INTO waitlist (email, store_url, sku_count, intent, source)
+    VALUES (
+      ${entry.email},
+      ${entry.storeUrl ?? null},
+      ${entry.skuCount ?? null},
+      ${entry.intent},
+      ${entry.source ?? null}
+    )
+    ON CONFLICT (email) DO UPDATE SET
+      intent = CASE
+        WHEN EXCLUDED.intent = 'founding' THEN 'founding'
+        ELSE waitlist.intent
+      END,
+      store_url = COALESCE(EXCLUDED.store_url, waitlist.store_url),
+      sku_count = COALESCE(EXCLUDED.sku_count, waitlist.sku_count)
+    RETURNING id, email, store_url, sku_count, intent, source, created_at
+  `) as WaitlistRow[];
+  return mapWaitlist(rows[0]);
 }
 
 export async function listWaitlist(): Promise<WaitlistEntry[]> {
-  return readJson<WaitlistEntry[]>("waitlist.json", []);
+  const db = sql();
+  const rows = (await db`
+    SELECT id, email, store_url, sku_count, intent, source, created_at
+    FROM waitlist
+    ORDER BY created_at DESC
+  `) as WaitlistRow[];
+  return rows.map(mapWaitlist);
 }
 
 export async function saveScan(scan: ScanResult): Promise<void> {
