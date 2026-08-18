@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getStripe, PLANS, pricingConfigured } from "@/lib/stripe";
+import { getStripe, PLANS, pricingConfigured, STRIPE_TAX_CODE } from "@/lib/stripe";
 import { upsertSubscription } from "@/lib/store";
 
 const schema = z.object({
@@ -51,6 +51,7 @@ export async function POST(req: Request) {
             product_data: {
               name: `ShelfCheck ${plan.name}`,
               description: plan.description,
+              tax_code: STRIPE_TAX_CODE,
             },
           },
         },
