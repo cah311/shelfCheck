@@ -16,8 +16,8 @@ export const PLANS = {
   },
 } as const;
 
-/** Stripe tax code: SaaS — business use. Required when Managed Payments is on. */
-export const STRIPE_TAX_CODE = "txcd_10103002";
+/** Stripe tax code: SaaS — business use (Managed Payments eligible). */
+export const STRIPE_TAX_CODE = "txcd_10103001";
 
 export function getStripe(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY;

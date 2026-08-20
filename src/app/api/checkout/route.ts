@@ -56,6 +56,8 @@ export async function POST(req: Request) {
           },
         },
       ],
+      // Founding includes manual onboarding; Managed Payments is for fully automated digital goods.
+      managed_payments: { enabled: false },
       success_url: `${origin}/app?email=${encodeURIComponent(parsed.email)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#pricing`,
       metadata: {
